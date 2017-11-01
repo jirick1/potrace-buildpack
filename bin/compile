@@ -5,19 +5,33 @@ indent() {
 }
 
 BUILD_DIR=$1
+echo "Build DIR --- $BUILD_DIR"
 CACHE_DIR=$2
+echo "Cache DIR --- $CACHE_DIR"
 ENV_DIR=$3
+echo "Evn DIR --- $EVN_DIR"
+
 
 POTRACE_VERSION="1.15"
 CACHE_FILE="$CACHE_DIR/$POTRACE_VERSION.tar.gz"
+echo "Cache file --- $CACHE_FILE"
+
 VENDOR_DIR="$BUILD_DIR/vendor"
+echo "Vendor DIR --- $VENDOR_DIR"
+
 INSTALL_DIR="$VENDOR_DIR/potrace"
+echo "Install DIR --- $INSTALL_DIR"
+
 POTRACE_DIR="$BUILD_DIR/potrace-$POTRACE_VERSION"
+echo "Potrace DIR --- $POTRACE_DIR"
+
 mkdir -p $VENDOR_DIR
 mkdir -p $INSTALL_DIR
 mkdir -p $POTRACE_DIR
 
+
 POTRACE_FILE="$POTRACE_VERSION.tar.gz"
+echo "Potrace file --- $POTRACE_FILE"
 
 POTRACE_URL="http://github.com/skyrpex/potrace/archive/$POTRACE_FILE" # use http because https to avoid ssl cert issues
 
@@ -33,8 +47,9 @@ download_potrace_source() {
 }
 
 extract_potrace_source() {
-  echo "------> Extracting Potrace from $BUILD_DIR/$POTRACE_FILE"
-  tar xvf $BUILD_DIR/$POTRACE_FILE | indent
+  cd $BUILD_DIR
+  echo "------> Extracting Potrace from $POTRACE_FILE"
+  tar xvf $POTRACE_FILE | indent
 }
 
 configure_and_make() {
@@ -85,7 +100,7 @@ set_env_vars() {
   # update PATH and LD_LIBRARY_PATH
   echo "------> Updating enviroment variables"
   PROFILE_PATH="$BUILD_DIR/.profile.d/potrace.sh"
-  ACTUAL_INSTALL_PATH="$HOME/vendor/potrace"
+  ACTUAL_INSTALL_PATH="$INSTALL_DIR"
 
   mkdir -p $(dirname $PROFILE_PATH)
   echo "export PATH=$ACTUAL_INSTALL_PATH/bin:\$PATH" >> $PROFILE_PATH
