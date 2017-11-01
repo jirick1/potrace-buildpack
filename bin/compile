@@ -70,8 +70,8 @@ move_build_output_to_cache_dir(){
 
   
   echo "------> Moving build output to cache_dir"
-  cd ..
-  tar czf $POTRACE_DIR.tar.gz $POTRACE_DIR
+  
+  tar czf $POTRACE_DIR.tar.gz *
   mv $POTRACE_DIR.tar.gz $CACHE_FILE
 
   echo "------> Removing $POTRACE_DIR"
