@@ -1,0 +1,109 @@
+#!/bin/bash
+
+indent() {
+  sed -u 's/^/       /'
+}
+
+BUILD_DIR=$1
+CACHE_DIR=$2
+ENV_DIR=$3
+
+POTRACE_VERSION="1.15"
+CACHE_FILE="$CACHE_DIR/$POTRACE_VERSION.tar.gz"
+VENDOR_DIR="$BUILD_DIR/vendor"
+INSTALL_DIR="$VENDOR_DIR/potrace"
+
+mkdir -p $VENDOR_DIR
+mkdir -p $INSTALL_DIR
+
+POTRACE_FILE="$POTRACE_VERSION.tar.gz"
+POTRACE_DIR="potrace-$POTRACE_VERSION"
+POTRACE_URL="http://github.com/skyrpex/potrace/archive/$POTRACE_FILE" # use http because https to avoid ssl cert issues
+
+download_potrace_source() {
+  echo "------> Downloading Potrace from $POTRACE_URL"
+  wget $POTRACE_URL -P $BUILD_DIR | indent
+
+  if [ ! -f $BUILD_DIR/$POTRACE_FILE ]; then
+    echo "Error: Unable to download Potrace" | indent
+    ls $BUILD_DIR | indent
+    exit 1;
+  fi
+}
+
+extract_potrace_source() {
+  echo "------> Extracting Potrace from $BUILD_DIR/$POTRACE_FILE"
+  tar xvf $BUILD_DIR/$POTRACE_FILE | indent
+}
+
+configure_and_make() {
+  echo "------> Building Potrace"
+  echo "Potrace DIR $POTRACE_DIR"
+  cd $POTRACE_DIR
+
+  export CPPFLAGS="-I$INSTALL_DIR/include"
+  export LDFLAGS="-L$INSTALL_DIR/lib"
+  ./configure --prefix=$INSTALL_DIR --disable-zlib
+  make && install 
+}
+
+move_build_output_to_cache_dir(){
+  cd $POTRACE_DIR
+  echo "------> Copying $POTRACE_DIR to $INSTALL_DIR"
+  cp -R * $INSTALL_DIR
+
+  
+  echo "------> Moving build output to cache_dir"
+  cd ..
+  tar czf $POTRACE_DIR.tar.gz $POTRACE_DIR
+  mv $POTRACE_DIR.tar.gz $CACHE_FILE
+
+  echo "------> Removing $POTRACE_DIR"
+  rm -rf $POTRACE_DIR
+}
+
+build_from_cache() {
+  echo "------> Extracting potrace $CACHE_FILE => $VENDOR_DIR"
+  tar xzf $CACHE_FILE -C $INSTALL_DIR --strip 1
+}
+
+
+create_policy() {
+  echo "------> Writing policy file"
+  cat > $INSTALL_DIR/policy.xml <<EOF
+  <policymap>
+  <policy domain="coder" rights="none" pattern="EPHEMERAL" />
+  <policy domain="coder" rights="none" parttern="HTTPS" /> 
+  <policy domain="coder" rights="none" parttern="MVG" />
+  <policy domain="coder" rights="none" parttern="MSL" />
+  </policymap>
+EOF
+}
+
+set_env_vars() {
+  # update PATH and LD_LIBRARY_PATH
+  echo "------> Updating enviroment variables"
+  PROFILE_PATH="$BUILD_DIR/.profile.d/potrace.sh"
+  ACTUAL_INSTALL_PATH="$HOME/vendor/potrace"
+
+  mkdir -p $(dirname $PROFILE_PATH)
+  echo "export PATH=$ACTUAL_INSTALL_PATH/bin:\$PATH" >> $PROFILE_PATH
+  echo "export LD_LIBRARY_PATH=$ACTUAL_INSTALL_PATH/lib:\$LD_LIBRARY_PATH" >> $PROFILE_PATH
+  echo "export POTRACE_CONFIGURE_PATH=$ACTUAL_INSTALL_PATH" >> $PROFILE_PATH
+}
+
+echo "------> Installing Potrace-$POTRACE_VERSION"
+
+if [ ! -f $CACHE_FILE ]; then  
+  download_potrace_source
+  extract_potrace_source
+  configure_and_make
+  move_build_output_to_cache_dir
+else
+  build_from_cache
+fi  
+
+create_policy
+set_env_vars
+
+
