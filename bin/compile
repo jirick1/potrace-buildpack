@@ -12,12 +12,13 @@ POTRACE_VERSION="1.15"
 CACHE_FILE="$CACHE_DIR/$POTRACE_VERSION.tar.gz"
 VENDOR_DIR="$BUILD_DIR/vendor"
 INSTALL_DIR="$VENDOR_DIR/potrace"
-
+POTRACE_DIR="$BUILD_DIR/potrace-$POTRACE_VERSION"
 mkdir -p $VENDOR_DIR
 mkdir -p $INSTALL_DIR
+mkdir -p $POTRACE_DIR
 
 POTRACE_FILE="$POTRACE_VERSION.tar.gz"
-POTRACE_DIR="potrace-$POTRACE_VERSION"
+
 POTRACE_URL="http://github.com/skyrpex/potrace/archive/$POTRACE_FILE" # use http because https to avoid ssl cert issues
 
 download_potrace_source() {
