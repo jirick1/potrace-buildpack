@@ -5,25 +5,25 @@ indent() {
 }
 
 BUILD_DIR=$1
-echo "Build DIR --- $BUILD_DIR"
+echo "------> Build DIR --- $BUILD_DIR"
 CACHE_DIR=$2
-echo "Cache DIR --- $CACHE_DIR"
+echo "------> Cache DIR --- $CACHE_DIR"
 ENV_DIR=$3
-echo "Evn DIR --- $EVN_DIR"
+echo "------> Evn DIR --- $EVN_DIR"
 
 
 POTRACE_VERSION="1.15"
 CACHE_FILE="$CACHE_DIR/$POTRACE_VERSION.tar.gz"
-echo "Cache file --- $CACHE_FILE"
+echo "------> Cache file --- $CACHE_FILE"
 
 VENDOR_DIR="$BUILD_DIR/vendor"
-echo "Vendor DIR --- $VENDOR_DIR"
+echo "------> Vendor DIR --- $VENDOR_DIR"
 
 INSTALL_DIR="$VENDOR_DIR/potrace"
-echo "Install DIR --- $INSTALL_DIR"
+echo "------> Install DIR --- $INSTALL_DIR"
 
 POTRACE_DIR="$BUILD_DIR/potrace-$POTRACE_VERSION"
-echo "Potrace DIR --- $POTRACE_DIR"
+echo "------> Potrace DIR --- $POTRACE_DIR"
 
 mkdir -p $VENDOR_DIR
 mkdir -p $INSTALL_DIR
@@ -97,7 +97,6 @@ EOF
 }
 
 set_env_vars() {
-  # update PATH and LD_LIBRARY_PATH
   echo "------> Updating enviroment variables"
   PROFILE_PATH="$BUILD_DIR/.profile.d/potrace.sh"
   ACTUAL_INSTALL_PATH="$INSTALL_DIR"
