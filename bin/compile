@@ -24,6 +24,7 @@ POTRACE_FILE="$POTRACE_VERSION.tar.gz"
 POTRACE_URL="http://github.com/skyrpex/potrace/archive/$POTRACE_FILE"
 
 download_potrace_source() {
+  echo "-----> Downloading Potrace from $POTRACE_URL"
   wget $POTRACE_URL -P $BUILD_DIR | indent
 
   if [ ! -f $BUILD_DIR/$POTRACE_FILE ]; then
@@ -39,6 +40,7 @@ extract_potrace_source() {
 }
 
 configure_and_make() {
+  echo "-----> Configure/Make Potrace source"
   cd $POTRACE_DIR
 
   export CPPFLAGS="-I$INSTALL_DIR/include"
@@ -59,10 +61,12 @@ move_build_output_to_cache_dir(){
 }
 
 build_from_cache() {
+  echo "-----> Extracting Potrace from $CACHE_FILE => $VENDOR_DIR"
   tar xzf $CACHE_FILE -C $INSTALL_DIR --strip 1
 }
 
 create_policy() {
+  echo "-----> Adding policy "
   cat > $INSTALL_DIR/policy.xml <<EOF
   <policymap>
   <policy domain="coder" rights="none" pattern="EPHEMERAL" />
