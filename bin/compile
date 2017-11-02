@@ -8,7 +8,9 @@ BUILD_DIR=$1
 CACHE_DIR=$2
 ENV_DIR=$3
 
+
 POTRACE_VERSION="1.15"
+
 CACHE_FILE="$CACHE_DIR/$POTRACE_VERSION.tar.gz"
 VENDOR_DIR="$BUILD_DIR/vendor"
 INSTALL_DIR="$VENDOR_DIR/potrace"
@@ -65,17 +67,6 @@ build_from_cache() {
   tar xzf $CACHE_FILE -C $INSTALL_DIR --strip 1
 }
 
-create_policy() {
-  echo "-----> Adding policy "
-  cat > $INSTALL_DIR/policy.xml <<EOF
-  <policymap>
-  <policy domain="coder" rights="none" pattern="EPHEMERAL" />
-  <policy domain="coder" rights="none" parttern="HTTPS" /> 
-  <policy domain="coder" rights="none" parttern="MVG" />
-  <policy domain="coder" rights="none" parttern="MSL" />
-  </policymap>
-EOF
-}
 
 set_env_vars() {
   PROFILE_PATH="$BUILD_DIR/.profile.d/potrace.sh"
@@ -83,8 +74,6 @@ set_env_vars() {
 
   mkdir -p $(dirname $PROFILE_PATH)
   echo "export PATH=$ACTUAL_INSTALL_PATH/:\$PATH" >> $PROFILE_PATH
-  echo "export LD_LIBRARY_PATH=$ACTUAL_INSTALL_PATH/src:\$LD_LIBRARY_PATH" >> $PROFILE_PATH
-  echo "export POTRACE_CONFIGURE_PATH=$ACTUAL_INSTALL_PATH" >> $PROFILE_PATH
 }
 
 echo "------> Installing Potrace-$POTRACE_VERSION"
@@ -98,7 +87,4 @@ else
   build_from_cache
 fi  
 
-create_policy
 set_env_vars
-
-
