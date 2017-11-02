@@ -5,38 +5,25 @@ indent() {
 }
 
 BUILD_DIR=$1
-echo "------> Build DIR --- $BUILD_DIR"
 CACHE_DIR=$2
-echo "------> Cache DIR --- $CACHE_DIR"
 ENV_DIR=$3
-echo "------> Evn DIR --- $EVN_DIR"
-
 
 POTRACE_VERSION="1.15"
 CACHE_FILE="$CACHE_DIR/$POTRACE_VERSION.tar.gz"
-echo "------> Cache file --- $CACHE_FILE"
-
 VENDOR_DIR="$BUILD_DIR/vendor"
-echo "------> Vendor DIR --- $VENDOR_DIR"
-
 INSTALL_DIR="$VENDOR_DIR/potrace"
-echo "------> Install DIR --- $INSTALL_DIR"
-
 POTRACE_DIR="$BUILD_DIR/potrace-$POTRACE_VERSION"
-echo "------> Potrace DIR --- $POTRACE_DIR"
 
 mkdir -p $VENDOR_DIR
 mkdir -p $INSTALL_DIR
 mkdir -p $POTRACE_DIR
 
-
 POTRACE_FILE="$POTRACE_VERSION.tar.gz"
-echo "Potrace file --- $POTRACE_FILE"
 
-POTRACE_URL="http://github.com/skyrpex/potrace/archive/$POTRACE_FILE" # use http because https to avoid ssl cert issues
+# use http because https to avoid ssl cert issues
+POTRACE_URL="http://github.com/skyrpex/potrace/archive/$POTRACE_FILE"
 
 download_potrace_source() {
-  echo "------> Downloading Potrace from $POTRACE_URL"
   wget $POTRACE_URL -P $BUILD_DIR | indent
 
   if [ ! -f $BUILD_DIR/$POTRACE_FILE ]; then
@@ -48,44 +35,34 @@ download_potrace_source() {
 
 extract_potrace_source() {
   cd $BUILD_DIR
-  echo "------> Extracting Potrace from $POTRACE_FILE"
   tar xvf $POTRACE_FILE | indent
 }
 
 configure_and_make() {
-  echo "------> Building Potrace"
-  echo "Potrace DIR $POTRACE_DIR"
   cd $POTRACE_DIR
 
   export CPPFLAGS="-I$INSTALL_DIR/include"
-  export LDFLAGS="-L$INSTALL_DIR/lib"
+  export LDFLAGS="-L$INSTALL_DIR/lib
+  
   ./configure --prefix=$INSTALL_DIR --disable-zlib
   make && install 
 }
 
 move_build_output_to_cache_dir(){
   cd $POTRACE_DIR
-  echo "------> Copying $POTRACE_DIR to $INSTALL_DIR"
   cp -R * $INSTALL_DIR
-
-  
-  echo "------> Moving build output to cache_dir"
   
   tar czf $POTRACE_DIR.tar.gz *
   mv $POTRACE_DIR.tar.gz $CACHE_FILE
 
-  echo "------> Removing $POTRACE_DIR"
   rm -rf $POTRACE_DIR
 }
 
 build_from_cache() {
-  echo "------> Extracting potrace $CACHE_FILE => $VENDOR_DIR"
   tar xzf $CACHE_FILE -C $INSTALL_DIR --strip 1
 }
 
-
 create_policy() {
-  echo "------> Writing policy file"
   cat > $INSTALL_DIR/policy.xml <<EOF
   <policymap>
   <policy domain="coder" rights="none" pattern="EPHEMERAL" />
@@ -97,7 +74,6 @@ EOF
 }
 
 set_env_vars() {
-  echo "------> Updating enviroment variables"
   PROFILE_PATH="$BUILD_DIR/.profile.d/potrace.sh"
   ACTUAL_INSTALL_PATH="$INSTALL_DIR"
 
