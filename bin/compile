@@ -79,7 +79,7 @@ EOF
 
 set_env_vars() {
   PROFILE_PATH="$BUILD_DIR/.profile.d/potrace.sh"
-  ACTUAL_INSTALL_PATH="$INSTALL_DIR"
+  ACTUAL_INSTALL_PATH="$HOME/vendor/potrace"
 
   mkdir -p $(dirname $PROFILE_PATH)
   echo "export PATH=$ACTUAL_INSTALL_PATH/bin:\$PATH" >> $PROFILE_PATH
