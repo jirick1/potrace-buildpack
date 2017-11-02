@@ -44,9 +44,6 @@ extract_potrace_source() {
 configure_and_make() {
   echo "-----> Configure/Make Potrace source"
   cd $POTRACE_DIR
-
-  export CPPFLAGS="-I$INSTALL_DIR/include"
-  export LDFLAGS="-L$INSTALL_DIR/lib"
   
   ./configure --prefix=$INSTALL_DIR --disable-zlib
   make && install
@@ -66,7 +63,6 @@ build_from_cache() {
   echo "-----> Extracting Potrace from $CACHE_FILE => $VENDOR_DIR"
   tar xzf $CACHE_FILE -C $INSTALL_DIR --strip 1
 }
-
 
 set_env_vars() {
   PROFILE_PATH="$BUILD_DIR/.profile.d/potrace.sh"
